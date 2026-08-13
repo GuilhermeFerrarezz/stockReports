@@ -21,6 +21,7 @@ PALAVRAS_CHAVE_FUNDOS = {
 
 
 
+
 def loadDocuments (): 
     max_value = 2000
     offset = 0
