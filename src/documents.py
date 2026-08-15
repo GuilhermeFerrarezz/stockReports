@@ -2,32 +2,18 @@ import requests
 import time
 import json
 from datetime import datetime
+from names import getNames
 session = requests.Session()
 
-PALAVRAS_CHAVE_FUNDOS = {
-    "ZAGROS": "GGRC11",          # Nome atualizado na CVM/B3
-    "GUARDIAN": "GARE11",        
-    "XP CRÉDITO": "XPCI11",
-    "TRX": "TRXF11",
-    "RBR PRIVATE": "RBRY11",     # Diferenciação da família RBR
-    "RBR MULTI": "RBRX11",       # Diferenciação da família RBR
-    "RIZA": "RZTR11",
-    "REC RECEBÍVEIS": "RECR11",
-    "MÉRITO": "MFII11",
-    "TG ATIVO": "TGAR11",
-    "RBR RENDIMENTO": "RBRR11"   # Diferenciação da família RBR
-}
-
-
-
+fundos = ['GGRC11', 'TRXF11', 'HGLG11']
 
 
 def loadDocuments (): 
     max_value = 2000
     offset = 0
     today = datetime.now().strftime("%d/%m/%Y")
-    data_inicio = '14/07/2026'
-    data_final = '19/07/2026'
+    data_inicio = '06/08/2026'
+    data_final = '06/08/2026'
     url = f"https://fnet.bmfbovespa.com.br/fnet/publico/pesquisarGerenciadorDocumentosDados"
    
     #https://fnet.bmfbovespa.com.br/fnet/publico/pesquisarGerenciadorDocumentosDados?d=1&s=0&l=20&dataInicial=17/07/2026&dataFinal=17/07/2026&l=200
@@ -77,20 +63,32 @@ def loadDocuments ():
     
 if __name__ == '__main__':
     fundos_wallet = []
+    
     print('Loading')
     all_documents = loadDocuments()
+    mapa_nomes_carteira = {}
+    
+    for ticker in fundos:
+        nomes = getNames(ticker) 
+        nome_oficial_maiusculo = str(nomes[0]).strip().upper()
+        mapa_nomes_carteira[ticker] = nome_oficial_maiusculo
+        
     for doc in all_documents:
-                   
-                    nome_completo = doc.get("descricaoFundo", "").strip().upper()
-                    ticker = None
-                    
-                    for palavra, sigla in PALAVRAS_CHAVE_FUNDOS.items():
-                        if palavra in nome_completo:
-                            print("\n=== ALERTA DA SUA CARTEIRA ===")
-                            print(f"Fundo Identificado: {sigla}")
-                            for chave, valor in doc.items():
-                                print(f"{chave}: {valor}")
-                            print("=" * 35)
+        nome_completo = doc.get("descricaoFundo", "").strip().upper()
+        
+        for ticker, nome_oficial in mapa_nomes_carteira.items():
+            if nome_oficial in nome_completo:
+                print("\n=== ALERTA DA SUA CARTEIRA ===")
+                print(f"Fundo Identificado: {ticker}")
+                
+                for chave, valor in doc.items():
+                    print(f"{chave}: {valor}")
+                print("=" * 35)
+            
+                doc['ticker_identificado'] = ticker
+                         
+                break                
+         
                             
                     
                     

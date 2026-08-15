@@ -5,7 +5,7 @@ names = []
 def getNames(ticker): 
     names = []
     ticker_limpo = ticker.removesuffix("11").upper()
-    print(ticker_limpo)
+    #print(ticker_limpo)
     nome_fundo = db_fundos.loc[db_fundos['ticker'] == ticker_limpo, 'Nome'].item()
     nome_fundo_pregao = db_fundos.loc[db_fundos['ticker'] == ticker_limpo, 'NomePregao'].item()
     names.append(nome_fundo)
